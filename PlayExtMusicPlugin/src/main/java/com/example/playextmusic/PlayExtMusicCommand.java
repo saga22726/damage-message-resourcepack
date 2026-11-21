@@ -134,14 +134,25 @@ public final class PlayExtMusicCommand implements CommandExecutor, TabCompleter,
     @EventHandler
     public void onResourcePackStatus(PlayerResourcePackStatusEvent event) {
         UUID id = event.getPlayer().getUniqueId();
+        PlayerResourcePackStatusEvent.Status status = event.getStatus();
+
+        // ACCEPTED and DOWNLOADED are progress notifications, not completion.
+        // Keep the pending playback until SUCCESSFULLY_LOADED, otherwise the
+        // terminal success event is ignored and sound never plays.
+        if (status == PlayerResourcePackStatusEvent.Status.ACCEPTED
+                || status == PlayerResourcePackStatusEvent.Status.DOWNLOADED) {
+            return;
+        }
+
         PackRequest request = requests.remove(id);
         if (request == null) return;
-        if (event.getStatus() == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
+
+        if (status == PlayerResourcePackStatusEvent.Status.SUCCESSFULLY_LOADED) {
             loadedPackVersions.put(id, request.pack().version());
             if (request.playback() != null) play(event.getPlayer(), request.playback());
-        } else if (event.getStatus() == PlayerResourcePackStatusEvent.Status.DECLINED
-                || event.getStatus() == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD
-                || event.getStatus() == PlayerResourcePackStatusEvent.Status.INVALID_URL) {
+        } else if (status == PlayerResourcePackStatusEvent.Status.DECLINED
+                || status == PlayerResourcePackStatusEvent.Status.FAILED_DOWNLOAD
+                || status == PlayerResourcePackStatusEvent.Status.INVALID_URL) {
             event.getPlayer().sendMessage("音樂資源包未載入，因此這次音效沒有播放。");
         }
     }
