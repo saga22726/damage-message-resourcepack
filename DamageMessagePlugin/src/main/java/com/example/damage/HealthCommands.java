@@ -78,9 +78,7 @@ public final class HealthCommands implements CommandExecutor {
         }
 
         if (!action.equals("healhp") && value > 100.0) {
-            sender.sendMessage(
-                    "百分比必須大於 0 且不超過 100。"
-            );
+            sender.sendMessage("百分比必須大於 0 且不超過 100。");
             return;
         }
 
@@ -93,9 +91,7 @@ public final class HealthCommands implements CommandExecutor {
                             targetSelector
                     );
         } catch (IllegalArgumentException exception) {
-            sender.sendMessage(
-                    "目標選擇器無效：" + targetSelector
-            );
+            sender.sendMessage("目標選擇器無效：" + targetSelector);
             return;
         }
 
@@ -109,9 +105,7 @@ public final class HealthCommands implements CommandExecutor {
         }
 
         if (targets.isEmpty()) {
-            sender.sendMessage(
-                    "沒有找到符合條件的存活實體。"
-            );
+            sender.sendMessage("沒有找到符合條件的存活實體。");
             return;
         }
 
@@ -135,8 +129,7 @@ public final class HealthCommands implements CommandExecutor {
 
             if (selectedSources.size() != 1) {
                 sender.sendMessage(
-                        "傷害源選擇器必須剛好選中一個實體；"
-                                + "目前選中 "
+                        "傷害源選擇器必須剛好選中一個實體；目前選中 "
                                 + selectedSources.size()
                                 + " 個。"
                 );
@@ -228,13 +221,8 @@ public final class HealthCommands implements CommandExecutor {
             String action,
             String[] args
     ) {
-        if (args.length < 3) {
-            sender.sendMessage(
-                    "用法：/" + action
-                            + " <目標> <百分比> "
-                            + "<physical|magic> [by <傷害源>] "
-                            + "[damagecause]"
-            );
+        if (args.length != 3 && args.length != 5) {
+            sendDamageUsage(sender, action);
             return null;
         }
 
@@ -253,23 +241,18 @@ public final class HealthCommands implements CommandExecutor {
 
         String damageSourceSelector = null;
 
-        if (args.length >= 5
-                && args[3].equalsIgnoreCase("by")) {
+        if (args.length == 5) {
+            if (!args[3].equalsIgnoreCase("by")) {
+                sender.sendMessage(
+                        "傷害源格式錯誤。請使用："
+                                + "/" + action
+                                + " <目標> <百分比> "
+                                + "<physical|magic> by <傷害源>"
+                );
+                return null;
+            }
+
             damageSourceSelector = args[4];
-        } else if (args.length == 4) {
-            sender.sendMessage(
-                    "傷害源格式錯誤，請使用："
-                            + "physical|magic by <傷害源>"
-            );
-            return null;
-        } else if (args.length > 5) {
-            sender.sendMessage(
-                    "參數過多。用法：/" + action
-                            + " <目標> <百分比> "
-                            + "<physical|magic> [by <傷害源>] "
-                            + "[damagecause]"
-            );
-            return null;
         }
 
         return new DamageArguments(
@@ -277,6 +260,17 @@ public final class HealthCommands implements CommandExecutor {
                 value,
                 damageType,
                 damageSourceSelector
+        );
+    }
+
+    private void sendDamageUsage(
+            CommandSender sender,
+            String action
+    ) {
+        sender.sendMessage(
+                "用法：/" + action
+                        + " <目標> <百分比> <physical|magic>"
+                        + " [by <傷害源>]"
         );
     }
 
@@ -335,12 +329,10 @@ public final class HealthCommands implements CommandExecutor {
 
             if (damageSource != null) {
                 builder.withCausingEntity(damageSource);
+                builder.withDirectEntity(damageSource);
             }
 
-            target.damage(
-                    amount,
-                    builder.build()
-            );
+            target.damage(amount, builder.build());
             return;
         }
 
