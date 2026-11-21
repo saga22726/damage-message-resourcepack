@@ -14,6 +14,7 @@ public final class PlayExtMusicPlugin extends JavaPlugin {
     private HttpServer httpServer;
     private Path musicDirectory;
     private Path packDirectory;
+    private ResourcePackManager resourcePackManager;
 
     @Override
     public void onEnable() {
@@ -25,6 +26,7 @@ public final class PlayExtMusicPlugin extends JavaPlugin {
         try {
             Files.createDirectories(musicDirectory);
             Files.createDirectories(packDirectory);
+            resourcePackManager = new ResourcePackManager(this);
             startHttpServer();
         } catch (IOException exception) {
             getLogger().severe("Unable to prepare music folders/HTTP server: " + exception.getMessage());
@@ -78,33 +80,26 @@ public final class PlayExtMusicPlugin extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (httpServer != null) {
-            httpServer.stop(0);
-        }
+        if (httpServer != null) httpServer.stop(0);
     }
 
-    Path musicDirectory() {
-        return musicDirectory;
-    }
-
-    Path packDirectory() {
-        return packDirectory;
-    }
-
-    String ffmpeg() {
-        return getConfig().getString("ffmpeg", "ffmpeg");
-    }
-
+    Path musicDirectory() { return musicDirectory; }
+    Path packDirectory() { return packDirectory; }
+    ResourcePackManager resourcePackManager() { return resourcePackManager; }
+    String ffmpeg() { return getConfig().getString("ffmpeg", "ffmpeg"); }
     String publicBaseUrl() {
         return getConfig().getString("http.public-base-url", "http://127.0.0.1:8766")
                 .replaceAll("/+$", "");
     }
-
     String resourcePackPrompt() {
-        return getConfig().getString("resource-pack-prompt", "Load external music?");
+        return getConfig().getString("resource-pack-prompt", "是否載入外部音樂片段？");
     }
-
-    int maxAudioSeconds() {
-        return getConfig().getInt("max-audio-seconds", 600);
+    String preloadPackName() {
+        String name = getConfig().getString("preload-pack-name", "playextmusic-preload.zip");
+        if (name.isBlank() || name.contains("/") || name.contains("\\") || name.contains("..")) {
+            return "playextmusic-preload.zip";
+        }
+        return name;
     }
+    int maxAudioSeconds() { return getConfig().getInt("max-audio-seconds", 600); }
 }
