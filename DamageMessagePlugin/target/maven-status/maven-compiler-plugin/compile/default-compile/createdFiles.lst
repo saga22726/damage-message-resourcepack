@@ -1,0 +1,4 @@
+com\example\damage\DamageMessagePlugin.class
+com\example\damage\DamageListener.class
+com\example\damage\HealthCommands$DamageArguments.class
+com\example\damage\HealthCommands.class

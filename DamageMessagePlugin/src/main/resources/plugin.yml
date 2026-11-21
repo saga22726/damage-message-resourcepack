@@ -1,0 +1,36 @@
+name: DamageMessagePlugin
+version: 2.1.0
+main: com.example.damage.DamageMessagePlugin
+api-version: "1.21"
+author: saga22726
+
+permissions:
+  damagemodify.use:
+    description: 使用血量治療與傷害指令
+    default: op
+
+commands:
+  healhp:
+    description: 治療目標指定血量
+    usage: "/healhp <目標> <血量>"
+    permission: damagemodify.use
+
+  healmax:
+    description: 按生命值上限百分比治療
+    usage: "/healmax <目標> <百分比>"
+    permission: damagemodify.use
+
+  damagemax:
+    description: 造成生命值上限百分比傷害
+    usage: "/damagemax <目標> <百分比> [by <傷害源>] "
+    permission: damagemodify.use
+
+  healmissing:
+    description: 按已損失生命值百分比治療
+    usage: "/healmissing <目標> <百分比>"
+    permission: damagemodify.use
+
+  damagemissing:
+    description: 造成已損失生命值百分比傷害
+    usage: "/damagemissing <目標> <百分比> [by <傷害源>] "
+    permission: damagemodify.use
