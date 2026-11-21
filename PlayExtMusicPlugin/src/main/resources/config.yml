@@ -1,0 +1,10 @@
+music-directory: "../DamageMessagePlugin/musicSrc"
+ffmpeg: "ffmpeg"
+http:
+  bind-address: "0.0.0.0"
+  port: 8766
+  # Set this to an address reachable by all players, including the port.
+  # Examples: http://192.168.1.20:8766 or https://music.example.com
+  public-base-url: "http://127.0.0.1:8766"
+resource-pack-prompt: "是否載入外部音樂片段？"
+max-audio-seconds: 600

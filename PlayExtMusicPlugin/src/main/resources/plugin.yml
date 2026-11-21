@@ -1,0 +1,15 @@
+name: PlayExtMusicPlugin
+version: 1.0.0
+main: com.example.playextmusic.PlayExtMusicPlugin
+api-version: '1.21.8'
+author: saga22726
+description: Play external audio clips to players through a generated resource pack.
+commands:
+  playextmusic:
+    description: Play a segment of an external audio file.
+    usage: /playextmusic <file> <start> <end> [source] [targets] [x y z] [volume] [minVolume]
+    permission: playextmusic.use
+permissions:
+  playextmusic.use:
+    description: Allows use of /playextmusic.
+    default: op
