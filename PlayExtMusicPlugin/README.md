@@ -1,33 +1,31 @@
 # PlayExtMusicPlugin
 
-獨立的 Paper 1.21.8 / Java 21 Maven 專案，提供 `/playextmusic`。音檔不是由 Minecraft 客戶端直接讀取 MP3；插件使用 ffmpeg 擷取片段、轉成 OGG，產生 Minecraft 資源包，送給目標玩家，玩家成功載入後再播放。
+Paper 1.21.8 / Java 21 插件，提供 `/playextmusic`。插件將音檔片段轉成 OGG，累積放進同一個固定 URL 的資源包；相同片段重播時不重新建立或傳送資源包。首次加入伺服器時會載入現有音效包；以後新增不同片段時，目標玩家只需載入更新版一次。
 
-## 前置條件與限制
+## 前置條件
 
-- 伺服器使用 Paper 1.21.8 與 Java 21。
-- 伺服器主機須安裝 ffmpeg，且 ffmpeg 支援 `libvorbis`。
-- 玩家必須能連到設定的 HTTP 公開網址與連接埠，並接受伺服器資源包。
-- 這個插件動態送出資源包。它可能與另一個伺服器資源包衝突；若你的 DamageMessagePlugin 已送資源包，建議將兩套資源整合成單一資源包後再使用。
-- minVolume 對遠於音量範圍的玩家以在玩家位置播放低音量方式近似原版效果。
+- Paper 1.21.8、Java 21。
+- 伺服器安裝支援 `libvorbis` 的 ffmpeg。
+- 玩家可以連線到 `http.public-base-url` 與設定連接埠，並接受伺服器資源包。
+- 若伺服器有其他資源包，需先整合資源包；Minecraft 客戶端的伺服器資源包會互相取代，不能各自獨立疊加。
 
-## 建置與安裝
+## 安裝與設定
 
-1. 進入 `PlayExtMusicPlugin`，執行 `mvn clean package`。
-2. 將 `target/PlayExtMusicPlugin.jar` 放入伺服器 `plugins/`，重啟。
-3. 編輯 `plugins/PlayExtMusicPlugin/config.yml`，把 `http.public-base-url` 改成玩家可連線的主機網址；若使用防火牆/NAT，開放設定的 TCP 連接埠（預設 8766）。
-4. 預設音檔目錄為 `plugins/DamageMessagePlugin/musicSrc`。把 MP3/WAV 等檔案放進去；若 DamageMessagePlugin 資料夾不存在，建立它與 `musicSrc` 子目錄即可。
-5. 重啟插件或伺服器後執行指令。
+1. 在 `PlayExtMusicPlugin` 目錄執行 `mvn clean package`，把 `target/PlayExtMusicPlugin.jar` 放入伺服器 `plugins/`，重啟。
+2. 將要用的 MP3/WAV/OGG 放入設定的 `music-directory`（預設 `plugins/DamageMessagePlugin/musicSrc`）。
+3. 編輯 `plugins/PlayExtMusicPlugin/config.yml`，將 `http.public-base-url` 設成玩家可連線的公開網址，例如 `http://你的伺服器IP:8766`，並確保防火牆/NAT 開放 TCP 8766。
+4. 玩家第一次呼叫尚未加入資源包的音效時，會收到資源包載入提示；已載入後可直接播放。玩家重新加入時會預載目前資源包。
 
-## 指令
+## 使用方式
 
 ```text
 /playextmusic <file> <start> <end> [source] [targets] [x y z [volume [minVolume]]]
 ```
 
-時間可以是秒數或 `分:秒`，例如 `0:01`、`1:20`、`80`。選項必須依序提供；要指定座標，就先提供 source 和 targets。source 支援 `master music record weather block hostile neutral player ambient voice`。目標支援 Bukkit/Paper 實體選擇器，但只有玩家能接收音效。
+時間可用秒數或 `分:秒`，例如 `0:01`、`1:20`。選項依序提供；要指定座標須先給 source 和 targets。範例：
 
 ```text
-/playextmusic XXX.mp3 0:01 0:20 ambient @a ~ ~ ~ 1 1
+/playextmusic going_4_gold.mp3 0:00 0:08 ambient @a
 ```
 
-生成的 ZIP 和短暫 OGG 檔位於 `plugins/PlayExtMusicPlugin/packs`；ZIP 由插件的 HTTP 服務提供下載。
+第一次播放一段新的片段時，插件會轉換並加入固定的 `playextmusic-preload.zip`。同一個來源檔案與時間片段之後重播不會再次載入。若上傳新音檔或使用不同時間範圍，資源包內容會增加，目標玩家需載入更新版一次；這是 Minecraft 資源包更新本身的限制。產生的包與轉換快取在 `plugins/PlayExtMusicPlugin/packs`，不要手動刪除 `clips` 資料夾，除非願意重新轉換片段。
