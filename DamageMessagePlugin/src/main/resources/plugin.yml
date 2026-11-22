@@ -22,7 +22,7 @@ commands:
 
   damagemax:
     description: 造成生命值上限百分比傷害
-    usage: "/damagemax <目標> <百分比> [by <傷害源>] "
+    usage: "/damagemax <目標> <百分比> <physical|magic> [by <傷害源>]"
     permission: damagemodify.use
 
   healmissing:
@@ -32,5 +32,10 @@ commands:
 
   damagemissing:
     description: 造成已損失生命值百分比傷害
-    usage: "/damagemissing <目標> <百分比> [by <傷害源>] "
+    usage: "/damagemissing <目標> <百分比> <physical|magic> [by <傷害源>]"
+    permission: damagemodify.use
+
+  damagecurrent:
+    description: 造成目標當前生命值百分比傷害
+    usage: "/damagecurrent <目標> <百分比> <physical|magic> [by <傷害源>]"
     permission: damagemodify.use
